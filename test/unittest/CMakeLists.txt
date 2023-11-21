@@ -23,10 +23,6 @@ FetchContent_MakeAvailable(googletest)
 
 include_directories(../../src)
 
-add_executable(simd_test simd_test.cpp)
-target_link_libraries(simd_test gtest_main)
-add_test(NAME simd_test COMMAND simd_test)
-
-add_executable(modint_test modint_test.cpp)
-target_link_libraries(modint_test gtest_main)
-add_test(NAME modint_test COMMAND modint_test)
+add_executable(test fft_test.cpp modint_test.cpp simd_test.cpp math_test.cpp)
+target_link_libraries(test gtest_main)
+add_test(NAME test COMMAND test)

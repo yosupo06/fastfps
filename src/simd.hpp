@@ -4,10 +4,9 @@
 #include <array>
 #include <cstdint>
 
-namespace fastfps {
+#include "types.hpp"
 
-using u32 = uint32_t;
-using u64 = uint64_t;
+namespace fastfps {
 
 struct u64x4;
 
@@ -31,6 +30,9 @@ struct u32x8 {
         return _mm256_blend_epi32(x, rhs.x, MASK);
     }
 
+    __m256i_u as_m256i_u() const {
+        return x;
+    }
     std::array<uint32_t, 8> to_array() const {
         alignas(32) std::array<uint32_t, 8> b;
         _mm256_store_si256((__m256i_u*)b.data(), x);
@@ -61,10 +63,9 @@ struct u32x8 {
         return u32x8(lhs) -= rhs;
     }
 
-    // (x0, x2, x4, x6)
-    friend u64x4 mul0(const u32x8& l, const u32x8& r);
-    // (x1, x3, x5, x7)
-    friend u64x4 mul1(const u32x8& l, const u32x8& r);
+    u32x8 permutevar(u32x8 idx) const {
+        return _mm256_permutevar8x32_epi32(x, idx.as_m256i_u());
+    }
 
   private:
     __m256i_u x;
@@ -125,12 +126,21 @@ struct u64x4 {
 };
 
 // (x0, x2, x4, x6)
-u64x4 mul0(const u32x8& l, const u32x8& r) {
-    return _mm256_mul_epu32(l.x, r.x);
+inline u64x4 mul0(const u32x8& l, const u32x8& r) {
+    return _mm256_mul_epu32(l.as_m256i_u(), r.as_m256i_u());
 }
-u64x4 mul1(const u32x8& l, const u32x8& r) {
-    return _mm256_mul_epu32(_mm256_shuffle_epi32(l.x, 0xf5),
-                            _mm256_shuffle_epi32(r.x, 0xf5));
+// (x1, x3, x5, x7)
+inline u64x4 mul1(const u32x8& l, const u32x8& r) {
+    return _mm256_mul_epu32(_mm256_shuffle_epi32(l.as_m256i_u(), 0xf5),
+                            _mm256_shuffle_epi32(r.as_m256i_u(), 0xf5));
+}
+
+inline u32x8 min(const u32x8& l, const u32x8& r) {
+    return _mm256_min_epu32(l.as_m256i_u(), r.as_m256i_u());
+}
+
+inline u32x8 max(const u32x8& l, const u32x8& r) {
+    return _mm256_max_epu32(l.as_m256i_u(), r.as_m256i_u());
 }
 
 }  // namespace fastfps

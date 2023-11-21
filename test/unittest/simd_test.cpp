@@ -149,3 +149,29 @@ TEST(SimdTest, U64x4ToU32x8) {
 
     ASSERT_EQ(expect, a.to_u32x8().to_array());
 }
+
+TEST(SimdTest, MinU32x8) {
+    u32x8 a = {1, 20, 30, 4, 50, 6, 7, 8};
+    u32x8 b = {10, 2, 3, 40, 5, 60, 70, 80};
+
+    auto expect = std::array<u32, 8>({1, 2, 3, 4, 5, 6, 7, 8});
+
+    ASSERT_EQ(expect, min(a, b).to_array());
+}
+TEST(SimdTest, MaxU32x8) {
+    u32x8 a = {1, 20, 30, 4, 50, 6, 7, 8};
+    u32x8 b = {10, 2, 3, 40, 5, 60, 70, 80};
+
+    auto expect = std::array<u32, 8>({10, 20, 30, 40, 50, 60, 70, 80});
+
+    ASSERT_EQ(expect, max(a, b).to_array());
+}
+
+TEST(SimdTest, PermuteVar) {
+    u32x8 a = {0, 1, 2, 3, 4, 5, 6, 7};
+    u32x8 idx = {6, 6, 2, 7, 0, 1, 6, 7};
+
+    auto expect = std::array<u32, 8>({6, 6, 2, 7, 0, 1, 6, 7});
+
+    ASSERT_EQ(expect, a.permutevar(idx).to_array());
+}
