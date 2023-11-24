@@ -8,15 +8,15 @@
 #include "types.hpp"
 #include "fft.hpp"
 
-#include "testutil/random.hpp"
+#include "random.hpp"
 
 using namespace fastfps;
 
 const u32 MOD = 998244353;
-using mintx8 = modintx8<MOD>;
+using mintx8 = ModInt8<MOD>;
 
 TEST(ModIntTest, FFTInfo) {
-    FFTInfo<MOD> info;
+    const auto& info = fft_info<MOD>;
     // 998244353 = 2^23 * 119 + 1
     ASSERT_EQ(23, info.ord2);
     for (int i = 0; i < info.ord2; i++) {
@@ -25,7 +25,7 @@ TEST(ModIntTest, FFTInfo) {
 }
 
 void naive_fft(std::vector<mintx8>& a) {
-    static FFTInfo<MOD> info;
+    const auto& info = fft_info<MOD>;
 
     std::vector<u32> b;
     for (auto x : a) {
@@ -62,7 +62,7 @@ void naive_fft(std::vector<mintx8>& a) {
 }
 
 void naive_ifft(std::vector<mintx8>& a) {
-    static FFTInfo<MOD> info;
+    const auto& info = fft_info<MOD>;
 
     std::vector<u32> b;
     for (auto x : a) {
@@ -99,15 +99,15 @@ void naive_ifft(std::vector<mintx8>& a) {
 }
 
 TEST(FFTTest, ButterflyStress) {
-    for (int ph = 0; ph < 100; ph++) {
-        int n = 1 << randint(0, 5);
+    for (int lg = 0; lg <= 7; lg++) {
+        int n = 1 << lg;
         std::vector<mintx8> expect(n);
         for (int i = 0; i < n; i++) {
             std::array<u32, 8> a;
             for (int j = 0; j < 8; j++) {
                 a[j] = randint(0u, MOD - 1);
             }
-            expect[i] = a;
+            expect[i] = u32x8(a);
         }
         auto actual = expect;
 
@@ -119,15 +119,15 @@ TEST(FFTTest, ButterflyStress) {
 }
 
 TEST(FFTTest, InvButterflyStress) {
-    for (int ph = 0; ph < 100; ph++) {
-        int n = 1 << randint(0, 5);
+    for (int lg = 0; lg <= 7; lg++) {
+        int n = 1 << lg;
         std::vector<mintx8> expect(n);
         for (int i = 0; i < n; i++) {
             std::array<u32, 8> a;
             for (int j = 0; j < 8; j++) {
                 a[j] = randint(0u, MOD - 1);
             }
-            expect[i] = a;
+            expect[i] = u32x8(a);
         }
         std::vector<mintx8> actual = expect;
 

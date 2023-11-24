@@ -44,6 +44,6 @@ constexpr u32 primitive_root_constexpr(u32 m) {
         if (ok) return g;
     }
 }
-template <int m> constexpr int primitive_root = primitive_root_constexpr(m);
+template <u32 m> constexpr u32 primitive_root = primitive_root_constexpr(m);
 
 }  // namespace fastfps

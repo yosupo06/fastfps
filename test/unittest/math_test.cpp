@@ -1,11 +1,11 @@
-#include "math.hpp"
-
 #include <array>
 #include <numeric>
 #include <random>
 #include <vector>
 
 #include <gtest/gtest.h>
+
+#include "math.hpp"
 
 using namespace fastfps;
 
