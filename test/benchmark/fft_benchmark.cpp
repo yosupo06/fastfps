@@ -10,10 +10,10 @@
 
 using namespace fastfps;
 const u32 MOD = 998244353;
-using mintx8 = ModInt8<MOD>;
+using modint8 = ModInt8<MOD>;
 
 void BM_fft(benchmark::State& state) {
-    std::vector<mintx8> a(state.range(0));
+    std::vector<modint8> a(state.range(0));
     for (int i = 0; i < state.range(0); i++) {
         std::array<u32, 8> b;
         for (int j = 0; j < 8; j++) {
@@ -29,7 +29,7 @@ void BM_fft(benchmark::State& state) {
 BENCHMARK(BM_fft)->RangeMultiplier(2)->Range(1, 1 << 20);
 
 void BM_ifft(benchmark::State& state) {
-    std::vector<mintx8> a(state.range(0));
+    std::vector<modint8> a(state.range(0));
     for (int i = 0; i < state.range(0); i++) {
         std::array<u32, 8> b;
         for (int j = 0; j < 8; j++) {

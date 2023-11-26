@@ -37,7 +37,7 @@ TEST(SimdTest, BlendU32x8) {
     u32x8 a = {1, 2, 3, 4, 5, 6, 7, 8};
     u32x8 b = {10, 20, 30, 40, 50, 60, 70, 80};
 
-    ASSERT_EQ(u32x8(1, 20, 30, 4, 5, 6, 7, 80), a.blend<0b10000110>(b));
+    ASSERT_EQ(u32x8(1, 20, 30, 4, 5, 6, 7, 80), blend<0b10000110>(a, b));
 }
 
 // equal
@@ -185,4 +185,10 @@ TEST(SimdTest, PermuteVar) {
     u32x8 idx = {6, 6, 2, 7, 0, 1, 6, 7};
 
     ASSERT_EQ(u32x8(60, 60, 20, 70, 0, 10, 60, 70), a.permutevar(idx));
+}
+
+TEST(SimdTest, NegU32x8) {
+    u32x8 a = {1, 2, 3, 4, 5, 6, 7, 8};
+
+    ASSERT_EQ(u32x8(-1, -2, -3, -4, -5, -6, -7, -8), -a);
 }

@@ -20,8 +20,9 @@ struct u32x8 {
 
     static u32x8 set1(u32 x) { return u32x8(_mm256_set1_epi32(x)); }
 
-    template <uint8_t MASK> u32x8 blend(const u32x8& rhs) const {
-        return _mm256_blend_epi32(x, rhs.x, MASK);
+    template <uint8_t MASK>
+    friend u32x8 blend(const u32x8& lhs, const u32x8& rhs) {
+        return _mm256_blend_epi32(lhs.x, rhs.x, MASK);
     }
 
     __m256i_u as_m256i_u() const { return x; }
@@ -54,13 +55,16 @@ struct u32x8 {
     friend u32x8 operator-(const u32x8& lhs, const u32x8& rhs) {
         return u32x8(lhs) -= rhs;
     }
-
     u32x8& operator*=(const u32x8& rhs) {
         x = _mm256_mullo_epi32(x, rhs.x);
         return *this;
     }
     friend u32x8 operator*(const u32x8& lhs, const u32x8& rhs) {
         return u32x8(lhs) *= rhs;
+    }
+
+    u32x8 operator-() const {
+        return u32x8() - *this;
     }
 
     friend bool operator==(const u32x8& lhs, const u32x8& rhs) {

@@ -2,13 +2,15 @@
 
 #include <array>
 
+#include "modint.hpp"
 #include "simd.hpp"
 #include "types.hpp"
-#include "modint.hpp"
 
 namespace fastfps {
 
 template <u32 MOD> struct ModInt8 {
+    using modint = ModInt<MOD>;
+
     static_assert(MOD % 2 && MOD <= (1U << 30) - 1,
                   "mod must be odd and at most 2^30 - 1");
 
@@ -20,22 +22,38 @@ template <u32 MOD> struct ModInt8 {
     static const u32x8 n_inv() { return u32x8::set1(-inv_u32(MOD)); }
 
     static constexpr u32 inv = -inv_u32(MOD);
-    
+
     static constexpr uint32_t B = ((1ull << 32)) % MOD;
     static constexpr uint32_t B2 = 1ull * B * B % MOD;
 
     ModInt8() {}
     ModInt8(u32x8 _x) : x(mul(_x, u32x8::set1(B2))) {}
-//    ModInt8(ModInt<MOD> _x) : x(u32x8::set1(_x.internal_val())) {}
-    ModInt8(u32 x0, u32 x1, u32 x2, u32 x3, u32 x4, u32 x5, u32 x6, u32 x7)
-        : ModInt8(u32x8(x0, x1, x2, x3, x4, x5, x6, x7)) {}
-    static ModInt8 set1(ModInt<MOD> x) {
+    ModInt8(modint x0,
+            modint x1,
+            modint x2,
+            modint x3,
+            modint x4,
+            modint x5,
+            modint x6,
+            modint x7)
+        : x(u32x8(x0.internal_val(),
+                  x1.internal_val(),
+                  x2.internal_val(),
+                  x3.internal_val(),
+                  x4.internal_val(),
+                  x5.internal_val(),
+                  x6.internal_val(),
+                  x7.internal_val())) {}
+    ModInt8(std::array<modint, 8> _x)
+        : ModInt8(_x[0], _x[1], _x[2], _x[3], _x[4], _x[5], _x[6], _x[7]) {}
+
+    static ModInt8 set1(modint x) {
         ModInt8 v;
         v.x = u32x8::set1(x.internal_val());
         return v;
     }
 
-    std::array<u32, 8> to_array() const {
+    std::array<u32, 8> val() const {
         auto a = mul(x, u32x8::set1(1)).to_array();
         // TODO: optimize
         std::array<u32, 8> b;
@@ -73,9 +91,11 @@ template <u32 MOD> struct ModInt8 {
 
     template <int N> ModInt8 neg() const {
         ModInt8 v;
-        v.x = x.blend<N>(u32x8::set1(2 * MOD) - x);
+        v.x = blend<N>(x, u32x8::set1(2 * MOD) - x);
         return v;
     }
+
+    ModInt8 operator-() const { return ModInt8() - *this; }
 
     template <int N> ModInt8 shuffle() const {
         // TODO: avoid to use intrincs directly
@@ -92,13 +112,20 @@ template <u32 MOD> struct ModInt8 {
 
     friend bool operator==(const ModInt8& lhs, const ModInt8& rhs) {
         // TODO: optimize
-        return lhs.to_array() == rhs.to_array();
+        return lhs.val() == rhs.val();
     }
 
     // a.permutevar(idx)[i] = a[idx[i] % 8]
     ModInt8 permutevar(u32x8 idx) const {
         ModInt8 v;
         v.x = x.permutevar(idx);
+        return v;
+    }
+
+    template <uint8_t MASK>
+    friend ModInt8 blend(const ModInt8& lhs, const ModInt8& rhs) {
+        ModInt8 v;
+        v.x = blend<MASK>(lhs.x, rhs.x);
         return v;
     }
 
@@ -112,7 +139,7 @@ template <u32 MOD> struct ModInt8 {
         auto x1 = mul1(l, r);
         x0 += mul0(mul0(x0.to_u32x8(), n_inv()).to_u32x8(), MOD_X);
         x1 += mul0(mul0(x1.to_u32x8(), n_inv()).to_u32x8(), MOD_X);
-        return x1.to_u32x8().blend<0b01010101>(x0.rshift<32>().to_u32x8());
+        return blend<0b01010101>(x1.to_u32x8(), x0.rshift<32>().to_u32x8());
     }
 };
 
