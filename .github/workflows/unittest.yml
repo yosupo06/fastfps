@@ -9,9 +9,6 @@ on:
 jobs:
   gtest:    
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        cxx: [g++, clang++]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,5 +20,4 @@ jobs:
           make
           ctest -VV
         env:
-          CXX: ${{ matrix.cxx }}
           GTEST_COLOR: "1"
