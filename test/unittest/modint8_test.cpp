@@ -72,14 +72,6 @@ TEST(ModInt8Test, Equal) {
     ASSERT_FALSE(a == c);
 }
 
-TEST(ModInt8Test, Neg) {
-    modint8 a(0, 0, 1, 1, 2, 2, 3, 3);
-
-    modint8 expect(0, MOD - 0, MOD - 1, 1, MOD - 2, 2, MOD - 3, 3);
-
-    ASSERT_EQ(expect.val(), a.neg<0b01010110>().val());
-}
-
 TEST(ModInt8Test, PermuteVar) {
     modint8 a = {0, 10, 20, 30, 40, 50, 60, 70};
     u32x8 idx = {6, 6, 2, 7, 0, 1, 6, 7};
@@ -94,7 +86,7 @@ TEST(ModInt8Test, Blend) {
     ASSERT_EQ(modint8(1, 20, 30, 4, 5, 6, 7, 80), blend<0b10000110>(a, b));
 }
 
-TEST(ModInt8Test, Negate) {
+TEST(ModInt8Test, Neg) {
     modint8 a = {1, 2, 3, 4, 5, 6, 7, 8};
 
     ASSERT_EQ(modint8(-1, -2, -3, -4, -5, -6, -7, -8), -a);

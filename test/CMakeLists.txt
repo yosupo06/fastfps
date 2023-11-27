@@ -35,7 +35,8 @@ add_executable(test
   unittest/modint_test.cpp
   unittest/simd_test.cpp
   unittest/math_test.cpp
-  unittest/modint8_test.cpp)
+  unittest/modint8_test.cpp
+  unittest/modvec_test.cpp)
 target_link_libraries(test gtest_main)
 add_test(NAME test COMMAND test)
 

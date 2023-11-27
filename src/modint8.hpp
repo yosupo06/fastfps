@@ -89,26 +89,7 @@ template <u32 MOD> struct ModInt8 {
         return ModInt8(lhs) *= rhs;
     }
 
-    template <int N> ModInt8 neg() const {
-        ModInt8 v;
-        v.x = blend<N>(x, u32x8::set1(2 * MOD) - x);
-        return v;
-    }
-
     ModInt8 operator-() const { return ModInt8() - *this; }
-
-    template <int N> ModInt8 shuffle() const {
-        // TODO: avoid to use intrincs directly
-        ModInt8 v;
-        v.x = _mm256_shuffle_epi32(x.as_m256i_u(), N);
-        return v;
-    }
-    template <int N> ModInt8 shufflex4() const {
-        // TODO: avoid to use intrincs directly
-        ModInt8 v;
-        v.x = _mm256_permute2x128_si256(x.as_m256i_u(), x.as_m256i_u(), N);
-        return v;
-    }
 
     friend bool operator==(const ModInt8& lhs, const ModInt8& rhs) {
         // TODO: optimize
