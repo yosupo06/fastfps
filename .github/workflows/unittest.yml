@@ -1,0 +1,28 @@
+name: Unittest
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+
+jobs:
+  gtest:    
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cxx: [g++, clang++]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: run unittest
+        run: |
+          cd test/unittest
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=$STDCXX
+          make
+          ctest -VV
+        env:
+          CXX: ${{ matrix.cxx }}
+          GTEST_COLOR: "1"
