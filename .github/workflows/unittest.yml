@@ -17,10 +17,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: run unittest
         run: |
-          cd test/unittest
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=$STDCXX
+          cmake ../test -DCMAKE_BUILD_TYPE=Debug
           make
           ctest -VV
         env:
