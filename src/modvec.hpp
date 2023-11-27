@@ -77,7 +77,7 @@ template <int MOD> struct ModVec {
             return *this;
         }
         n += rhs.n - 1;
-        int n2 = std::bit_ceil((size_t)n);
+        ssize_t n2 = (ssize_t)std::bit_ceil((size_t)n);
         auto rv = rhs.v;
         v.resize(n2);
         rv.resize(n2);
