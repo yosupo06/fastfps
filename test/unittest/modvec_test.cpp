@@ -21,9 +21,9 @@ const u32 MOD = 998244353;
 using modint = ModInt<MOD>;
 using modvec = ModVec<MOD>;
 
-TEST(ModVecTest, Constructor) {
-    modvec a = modvec({1, 2, 3});
-    ASSERT_EQ(std::vector<u32>({1, 2, 3}), a.val());
+TEST(ModVecTest, Val) {
+    modvec a = modvec({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+    ASSERT_EQ(std::vector<u32>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}), a.val());
 }
 
 TEST(ModVecTest, Add) {
@@ -41,7 +41,14 @@ TEST(ModVecTest, Sub) {
 }
 
 TEST(ModVecTest, Mul) {
-    modvec a = modvec({1, 2, 3});
-    modvec b = modvec({4, 5, 6});
-    ASSERT_EQ(modvec({4, 13, 28, 27, 18}), a * b);
+    {
+        modvec a = modvec({1, 2, 3});
+        modvec b = modvec({4, 5, 6});
+        ASSERT_EQ(modvec({4, 13, 28, 27, 18}), a * b);
+    }
+    {
+        modvec a = modvec({1, 1, 1, 1, 1, 1, 1, 1, 1});
+        modvec b = modvec({-1, 1});
+        ASSERT_EQ(modvec({-1, 0, 0, 0, 0, 0, 0, 0, 0, 1}), (a * b));
+    }
 }

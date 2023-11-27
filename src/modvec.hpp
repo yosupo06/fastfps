@@ -18,8 +18,8 @@ template <int MOD> struct ModVec {
     ModVec() : n(0), v() {}
 
     ModVec(const std::vector<modint>& _v) : n(std::ssize(_v)), v(vsize(n)) {
-        for (int i = 0; i < vsize(n); i++) {
-            std::array<modint, 8> buf;
+        for (int i = 0; i < std::ssize(v); i++) {
+            std::array<modint, 8> buf{};
             for (int j = 0; j < 8 && (i * 8 + j) < n; j++) {
                 buf[j] = _v[i * 8 + j];
             }
@@ -32,7 +32,7 @@ template <int MOD> struct ModVec {
         for (int i = 0; i < std::ssize(v); i++) {
             std::array<u32, 8> buf = v[i].val();
             for (int j = 0; j < 8 && (i * 8 + j) < n; j++) {
-                _v[j] = buf[i * 8 + j];
+                _v[i * 8 + j] = buf[j];
             }
         }
         return _v;
@@ -77,7 +77,7 @@ template <int MOD> struct ModVec {
             return *this;
         }
         n += rhs.n - 1;
-        int n2 = 1 << std::bit_ceil((size_t)n);
+        int n2 = std::bit_ceil((size_t)n);
         auto rv = rhs.v;
         v.resize(n2);
         rv.resize(n2);
@@ -92,9 +92,7 @@ template <int MOD> struct ModVec {
         v.resize(vsize(n));
 
         modint8 inv = modint8::set1(modint(8 * n2).inv());
-        for (int i = 0; i < n; i++) {
-            v[i] *= inv;
-        }
+        for (auto& x : v) x *= inv;
         return *this;
     }
     friend ModVec operator*(const ModVec& lhs, const ModVec& rhs) {

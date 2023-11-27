@@ -43,3 +43,6 @@ add_test(NAME test COMMAND test)
 # benchmark
 add_executable(fft_bench benchmark/fft_benchmark.cpp)
 target_link_libraries(fft_bench benchmark::benchmark)
+
+# oj
+add_executable(oj_convolution oj/convolution.test.cpp)
