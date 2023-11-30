@@ -4,9 +4,9 @@
 #include <random>
 #include <vector>
 
-#include "fft.hpp"
-#include "modint.hpp"
-#include "modint8.hpp"
+#include "fastfps/fft.hpp"
+#include "fastfps/modint.hpp"
+#include "fastfps/modint8.hpp"
 
 namespace fastfps {
 
@@ -285,7 +285,7 @@ template <int MOD> struct ModVec {
     friend ModVec operator<<(const ModVec& lhs, ssize_t s) {
         return ModVec(lhs) <<= s;
     }
-    
+
     ModVec inv(int m) const {
         // TODO: Optimize
         assert(val(0) == 1);
@@ -299,7 +299,7 @@ template <int MOD> struct ModVec {
         res.resize(m);
         return res;
     }
-    
+
   private:
     ssize_t n;
     std::vector<modint8> v;

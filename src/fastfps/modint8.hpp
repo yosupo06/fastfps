@@ -9,9 +9,9 @@
 #include <cassert>
 #include <span>
 
-#include "math.hpp"
-#include "modint.hpp"
-#include "types.hpp"
+#include "fastfps/math.hpp"
+#include "fastfps/modint.hpp"
+#include "fastfps/types.hpp"
 
 namespace fastfps {
 

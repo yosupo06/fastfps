@@ -3,7 +3,7 @@
 #include <array>
 #include <cassert>
 
-#include "types.hpp"
+#include "fastfps/types.hpp"
 
 namespace fastfps {
 

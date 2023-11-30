@@ -6,10 +6,10 @@
 #include <ranges>
 #include <vector>
 
-#include "math.hpp"
-#include "modint.hpp"
-#include "modint8.hpp"
-#include "types.hpp"
+#include "fastfps/math.hpp"
+#include "fastfps/modint.hpp"
+#include "fastfps/modint8.hpp"
+#include "fastfps/types.hpp"
 
 namespace fastfps {
 
