@@ -18,6 +18,6 @@ jobs:
           cd build
           cmake ../test -DCMAKE_BUILD_TYPE=Debug
           make
-          ctest -VV
+          ./unittest
         env:
           GTEST_COLOR: "1"

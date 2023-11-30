@@ -2,6 +2,7 @@
 
 #include <immintrin.h>
 #include <array>
+#include <span>
 
 #include "math.hpp"
 #include "modint.hpp"
@@ -21,22 +22,32 @@ template <u32 MOD> struct ModInt8 {
     inline static const m256i_u MOD_X = _mm256_set1_epi32(MOD);
     inline static const m256i_u MOD2_X = _mm256_set1_epi32(2 * MOD);
     inline static const m256i_u N_INV_X = _mm256_set1_epi32(-inv_u32(MOD));
+    inline static const m256i_u INT_MIN_X = _mm256_set1_epi32(u32(1) << 31);
 
     static constexpr u32 B2 = pow_mod_constexpr(2, 64, MOD);
     inline static const m256i_u B2_X = _mm256_set1_epi32(B2);
 
     ModInt8() : x(_mm256_setzero_si256()) {}
-    ModInt8(const std::array<u32, 8>& _x)
+    ModInt8(std::span<const i32, 8> _x)
+        : x(mul(_mm256_sub_epi32(_mm256_loadu_si256((m256i_u*)_x.data()),
+                                 INT_MIN_X),
+                _mm256_set1_epi32(B2))) {
+        static const ModInt8 OFFSET = set1(u32(1) << 31);
+        *this -= OFFSET;
+    }
+    ModInt8(std::span<const u32, 8> _x)
         : x(mul(_mm256_loadu_si256((m256i_u*)_x.data()),
                 _mm256_set1_epi32(B2))) {}
-    ModInt8(modint x0,
-            modint x1,
-            modint x2,
-            modint x3,
-            modint x4,
-            modint x5,
-            modint x6,
-            modint x7)
+    ModInt8(std::span<const modint, 8> _x)
+        : x(_mm256_loadu_si256((m256i_u*)_x.data())) {}
+    explicit ModInt8(modint x0,
+                     modint x1,
+                     modint x2,
+                     modint x3,
+                     modint x4,
+                     modint x5,
+                     modint x6,
+                     modint x7)
         : x(_mm256_set_epi32(x7.internal_val(),
                              x6.internal_val(),
                              x5.internal_val(),
@@ -45,8 +56,6 @@ template <u32 MOD> struct ModInt8 {
                              x2.internal_val(),
                              x1.internal_val(),
                              x0.internal_val())) {}
-    ModInt8(std::array<modint, 8> _x)
-        : ModInt8(_x[0], _x[1], _x[2], _x[3], _x[4], _x[5], _x[6], _x[7]) {}
 
     static ModInt8 set1(modint x) {
         ModInt8 v;
@@ -115,7 +124,6 @@ template <u32 MOD> struct ModInt8 {
         return permutevar(_mm256_add_epi32(base, _mm256_set1_epi32(middle)));
     }
 
-
     template <uint8_t MASK>
     friend ModInt8 blend(const ModInt8& lhs, const ModInt8& rhs) {
         ModInt8 v;
@@ -166,4 +174,3 @@ template <typename T> struct is_modint8 : std::false_type {};
 template <u32 MOD> struct is_modint8<ModInt8<MOD>> : std::true_type {};
 
 }  // namespace fastfps
-

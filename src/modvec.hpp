@@ -37,7 +37,7 @@ template <int MOD> struct ModVec {
                 buf[j] = modint(*it);
                 it++;
             }
-            v[i] = buf;
+            v[i] = modint8(buf);
         }
     }
 
@@ -47,7 +47,7 @@ template <int MOD> struct ModVec {
             for (int j = 0; j < 8 && (i * 8 + j) < n; j++) {
                 buf[j] = _v[i * 8 + j];
             }
-            v[i] = buf;
+            v[i] = modint8(buf);
         }
     }
     ModVec(const std::vector<u32>& _v) : n(std::ssize(_v)), v(vsize(n)) {
@@ -56,7 +56,7 @@ template <int MOD> struct ModVec {
             for (int j = 0; j < 8 && (i * 8 + j) < n; j++) {
                 buf[j] = _v[i * 8 + j];
             }
-            v[i] = buf;
+            v[i] = modint8(buf);
         }
     }
 

@@ -100,7 +100,7 @@ TEST(ModVecTest, Resize) {
 
 TEST(ModVecTest, CopyTo) {
     for (int n = 0; n <= 24; n++) {
-        std::vector<modint> a(n);
+        std::vector<u32> a(n);
         for (int i = 0; i < n; i++) {
             a[i] = 100 + i;
         }
@@ -108,18 +108,14 @@ TEST(ModVecTest, CopyTo) {
         for (int start = 0; start <= n; start++) {
             for (int len = 0; start + len <= n; len++) {
                 for (int m = len; m <= 24; m++) {
-                    std::vector<modint> b(m);
+                    std::vector<u32> b(m);
                     for (int i = 0; i < m; i++) {
                         b[i] = 10000 + i;
                     }
                     for (int dst_start = 0; dst_start + len <= m; dst_start++) {
-                        auto expect2 = b;
+                        auto expect = b;
                         for (int i = 0; i < len; i++) {
-                            expect2[dst_start + i] = a[start + i];
-                        }
-                        std::vector<u32> expect(m);
-                        for (int i = 0; i < m; i++) {
-                            expect[i] = expect2[i].val();
+                            expect[dst_start + i] = a[start + i];
                         }
 
                         auto b2 = modvec(b);

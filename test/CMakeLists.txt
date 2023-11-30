@@ -30,14 +30,14 @@ include_directories(../src)
 include_directories(./util)
 
 # unittest
-add_executable(test
+add_executable(unittest
   unittest/fft_test.cpp
   unittest/modint_test.cpp
   unittest/math_test.cpp
   unittest/modint8_test.cpp
   unittest/modvec_test.cpp)
-target_link_libraries(test gtest_main)
-add_test(NAME test COMMAND test)
+target_link_libraries(unittest gtest_main)
+add_test(NAME test COMMAND unittest)
 
 # benchmark
 add_executable(fft_bench benchmark/fft_benchmark.cpp)
