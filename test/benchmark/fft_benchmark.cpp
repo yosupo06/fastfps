@@ -4,9 +4,9 @@
 
 #include <benchmark/benchmark.h>
 
-#include "fft.hpp"
-#include "modint.hpp"
-#include "types.hpp"
+#include "fastfps/fft.hpp"
+#include "fastfps/modint.hpp"
+#include "fastfps/types.hpp"
 
 using namespace fastfps;
 const u32 MOD = 998244353;

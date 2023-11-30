@@ -6,9 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "modint8.hpp"
-
-#include "random.hpp"
+#include "fastfps/modint8.hpp"
 
 using namespace fastfps;
 

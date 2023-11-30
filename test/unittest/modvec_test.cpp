@@ -5,10 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "modint.hpp"
-#include "modvec.hpp"
-
-#include "random.hpp"
+#include "fastfps/modint.hpp"
+#include "fastfps/modvec.hpp"
 
 using namespace fastfps;
 

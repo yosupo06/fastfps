@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include "math.hpp"
+#include "fastfps/math.hpp"
 
 using namespace fastfps;
 

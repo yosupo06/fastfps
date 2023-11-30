@@ -4,8 +4,8 @@
 #include <array>
 #include <iostream>
 
-#include "modint.hpp"
-#include "modvec.hpp"
+#include "fastfps/modint.hpp"
+#include "fastfps/modvec.hpp"
 
 using namespace std;
 using namespace fastfps;

@@ -5,8 +5,8 @@
 
 #include <gtest/gtest.h>
 
-#include "fft.hpp"
-#include "types.hpp"
+#include "fastfps/fft.hpp"
+#include "fastfps/types.hpp"
 
 #include "random.hpp"
 
