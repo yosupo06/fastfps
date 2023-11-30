@@ -3,6 +3,14 @@ cmake_minimum_required(VERSION 3.16)
 
 project(FastFPS)
 
+option(AVX2 "use avx2" ON)
+if(AVX2)
+  message("enable avx2")
+  add_compile_options(-mavx2)
+else()
+  message("disable avx2")
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -20,7 +28,6 @@ FetchContent_MakeAvailable(googlebenchmark)
 
 
 add_compile_options(-Wall -Wextra -Wshadow -Wconversion -Wno-sign-conversion -Werror)
-add_compile_options(-mavx2)
 
 # sanitizer
 add_compile_options("$<$<CONFIG:DEBUG>:-fsanitize=undefined,address;-fno-sanitize-recover=all>")

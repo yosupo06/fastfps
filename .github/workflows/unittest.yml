@@ -7,8 +7,12 @@ on:
   pull_request:
 
 jobs:
-  gtest:    
+  gtest:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        avx2: [ON, OFF]
 
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +20,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../test -DCMAKE_BUILD_TYPE=Debug
+          cmake ../test -DCMAKE_BUILD_TYPE=Debug -DAVX2=${{ matrix.avx2 }}
           make
           ./unittest
         env:

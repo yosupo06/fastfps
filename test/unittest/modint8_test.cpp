@@ -10,11 +10,6 @@
 
 using namespace fastfps;
 
-using i32 = int32_t;
-using u32 = uint32_t;
-using i64 = int64_t;
-using u64 = uint64_t;
-
 const u32 MOD = 998244353;
 using modint = ModInt<MOD>;
 using modint8 = ModInt8<MOD>;

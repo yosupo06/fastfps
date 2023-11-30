@@ -23,10 +23,6 @@ template <u32 MOD> struct ModInt {
 
     static constexpr u32 mod() { return MOD; }
 
-    static constexpr u32 B = ((u64(1) << 32)) % MOD;
-    static constexpr u32 B2 = u64(1) * B * B % MOD;
-    static constexpr u32 INV = -inv_u32(MOD);
-
     constexpr ModInt() : x(0) {}
     constexpr explicit ModInt(u32 _x) : x(mulreduce(_x, B2)) {}
 
@@ -35,7 +31,10 @@ template <u32 MOD> struct ModInt {
     constexpr ModInt(std::unsigned_integral auto _x)
         : ModInt((u32)(_x % MOD)) {}
 
-    constexpr u32 val() const { return mulreduce(x, 1); }
+    constexpr u32 val() const {
+        u32 y = mulreduce(x, 1);
+        return y < MOD ? y : y - MOD;
+    }
     constexpr u32 internal_val() const { return x; }
 
     constexpr ModInt& operator+=(const ModInt& rhs) {
@@ -88,6 +87,10 @@ template <u32 MOD> struct ModInt {
 
   private:
     u32 x;
+
+    static constexpr u32 B = ((u64(1) << 32)) % MOD;
+    static constexpr u32 B2 = u64(1) * B * B % MOD;
+    static constexpr u32 INV = -inv_u32(MOD);
 
     // Input: (l * r) must be no more than (2^32 * MOD)
     // Output: ((l * r) / 2^32) % MOD

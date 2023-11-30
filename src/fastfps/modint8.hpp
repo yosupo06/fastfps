@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef __AVX2__
 #include <immintrin.h>
+#endif
+
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <span>
@@ -10,6 +14,8 @@
 #include "types.hpp"
 
 namespace fastfps {
+
+#ifdef __AVX2__
 
 template <u32 MOD> struct ModInt8 {
     using modint = ModInt<MOD>;
@@ -33,8 +39,8 @@ template <u32 MOD> struct ModInt8 {
                 _mm256_set1_epi32(B2))) {}
     ModInt8(std::span<const modint, 8> _x)
         : x(_mm256_loadu_si256((m256i_u*)_x.data())) {
-            static_assert(sizeof(modint) == 4);
-        }
+        static_assert(sizeof(modint) == 4);
+    }
     explicit ModInt8(modint x0,
                      modint x1,
                      modint x2,
@@ -61,7 +67,8 @@ template <u32 MOD> struct ModInt8 {
     std::array<u32, 8> val() const {
         auto a = mul(x, _mm256_set1_epi32(1));
         alignas(32) std::array<u32, 8> b;
-        _mm256_storeu_si256((__m256i_u*)b.data(), min(a, _mm256_sub_epi32(a, MOD_X)));
+        _mm256_storeu_si256((__m256i_u*)b.data(),
+                            min(a, _mm256_sub_epi32(a, MOD_X)));
         return b;
     }
 
@@ -172,6 +179,141 @@ template <u32 MOD> struct ModInt8 {
         return v;
     }
 };
+
+#else
+
+template <u32 MOD> struct ModInt8 {
+    using modint = ModInt<MOD>;
+
+    static_assert(MOD % 2 && MOD <= (1U << 30) - 1,
+                  "mod must be odd and at most 2^30 - 1");
+
+    static constexpr u32 mod() { return MOD; }
+
+    ModInt8() : x({}) {}
+    ModInt8(std::span<const i32, 8> _x) {
+        for (int i = 0; i < 8; i++) {
+            x[i] = _x[i];
+        }
+    }
+    ModInt8(std::span<const u32, 8> _x) {
+        for (int i = 0; i < 8; i++) {
+            x[i] = _x[i];
+        }
+    }
+    ModInt8(std::span<const modint, 8> _x) {
+        for (int i = 0; i < 8; i++) {
+            x[i] = _x[i];
+        }
+    }
+    explicit ModInt8(modint x0,
+                     modint x1,
+                     modint x2,
+                     modint x3,
+                     modint x4,
+                     modint x5,
+                     modint x6,
+                     modint x7)
+        : x({x0, x1, x2, x3, x4, x5, x6, x7}) {}
+
+    static ModInt8 set1(modint x) { return ModInt8(x, x, x, x, x, x, x, x); }
+
+    std::array<u32, 8> val() const {
+        std::array<u32, 8> b;
+        for (int i = 0; i < 8; i++) {
+            b[i] = x[i].val();
+        }
+        return b;
+    }
+
+    ModInt8& operator+=(const ModInt8& rhs) {
+        for (int i = 0; i < 8; i++) {
+            x[i] += rhs.x[i];
+        }
+        return *this;
+    }
+    friend ModInt8 operator+(const ModInt8& lhs, const ModInt8& rhs) {
+        return ModInt8(lhs) += rhs;
+    }
+
+    ModInt8& operator-=(const ModInt8& rhs) {
+        for (int i = 0; i < 8; i++) {
+            x[i] -= rhs.x[i];
+        }
+        return *this;
+    }
+    friend ModInt8 operator-(const ModInt8& lhs, const ModInt8& rhs) {
+        return ModInt8(lhs) -= rhs;
+    }
+
+    ModInt8& operator*=(const ModInt8& rhs) {
+        for (int i = 0; i < 8; i++) {
+            x[i] *= rhs.x[i];
+        }
+        return *this;
+    }
+    friend ModInt8 operator*(const ModInt8& lhs, const ModInt8& rhs) {
+        return ModInt8(lhs) *= rhs;
+    }
+
+    ModInt8 operator-() const { return ModInt8() - *this; }
+
+    friend bool operator==(const ModInt8& lhs, const ModInt8& rhs) {
+        // TODO: optimize
+        for (int i = 0; i < 8; i++) {
+            if (lhs.x[i].val() != rhs.x[i].val()) return false;
+        }
+        return true;
+    }
+
+    // a.permutevar(idx)[i] = a[idx[i] % 8]
+    ModInt8 permutevar(const std::array<u32, 8>& idx) const {
+        ModInt8 v;
+        for (int i = 0; i < 8; i++) {
+            v.x[i] = x[idx[i] % 8];
+        }
+        return v;
+    }
+
+    // a[i] <- a[(middle + i) % 8]
+    ModInt8 rotate(u32 middle) const {
+        ModInt8 v(*this);
+        std::rotate(v.x.begin(), v.x.begin() + middle, v.x.end());
+        return v;
+    }
+
+    template <uint8_t MASK>
+    friend ModInt8 blend(const ModInt8& lhs, const ModInt8& rhs) {
+        ModInt8 v;
+        for (int i = 0; i < 8; i++) {
+            if (MASK & (1u << i)) {
+                v.x[i] = rhs.x[i];
+            } else {
+                v.x[i] = lhs.x[i];
+            }
+        }
+        return v;
+    }
+
+    friend ModInt8 blendvar(const ModInt8& lhs,
+                            const ModInt8& rhs,
+                            const std::array<u32, 8>& idx) {
+        ModInt8 v;
+        for (int i = 0; i < 8; i++) {
+            if (idx[i]) {
+                v.x[i] = rhs.x[i];
+            } else {
+                v.x[i] = lhs.x[i];
+            }
+        }
+        return v;
+    }
+
+  private:
+    std::array<modint, 8> x;
+};
+
+#endif
 
 template <typename T> struct is_modint8 : std::false_type {};
 template <u32 MOD> struct is_modint8<ModInt8<MOD>> : std::true_type {};

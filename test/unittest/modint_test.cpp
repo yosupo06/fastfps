@@ -27,6 +27,13 @@ TEST(ModIntTest, Constructor) {
     ASSERT_EQ(3, mint(u64(3)).val());
 }
 
+TEST(ModIntTest, Val) {
+    for (int i = 0; i < 100; i++) {
+        mint x(i);
+        ASSERT_EQ(i, x.val());
+    }
+}
+
 TEST(ModIntTest, Add) {
     ASSERT_EQ(mint(12), mint(2) + mint(10));
     ASSERT_EQ(mint(1), mint(MOD - 1000) + mint(1001));

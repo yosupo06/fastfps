@@ -10,18 +10,13 @@
 
 using namespace fastfps;
 
-using i32 = int32_t;
-using u32 = uint32_t;
-using i64 = int64_t;
-using u64 = uint64_t;
-
 const u32 MOD = 998244353;
 using modint = ModInt<MOD>;
 using modvec = ModVec<MOD>;
 
 TEST(ModVecTest, Constructor) {
     ASSERT_EQ(modvec({0, 0, 0, 0}), modvec(4));
-    ASSERT_EQ(modvec(std::vector<modint>({1})), modvec({1}));
+    ASSERT_EQ((modvec(std::vector<modint>({modint(1)}))), modvec({1}));
 }
 
 TEST(ModVecTest, Val) {
