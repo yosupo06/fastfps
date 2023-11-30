@@ -33,7 +33,6 @@ include_directories(./util)
 add_executable(test
   unittest/fft_test.cpp
   unittest/modint_test.cpp
-  unittest/simd_test.cpp
   unittest/math_test.cpp
   unittest/modint8_test.cpp
   unittest/modvec_test.cpp)

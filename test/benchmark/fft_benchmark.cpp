@@ -19,7 +19,7 @@ void BM_fft(benchmark::State& state) {
         for (int j = 0; j < 8; j++) {
             b[j] = i * 8 + j + 1234;
         }
-        a[i] = u32x8(b);
+        a[i] = b;
     }
     for (auto _ : state) {
         fft(a);
@@ -35,7 +35,7 @@ void BM_ifft(benchmark::State& state) {
         for (int j = 0; j < 8; j++) {
             b[j] = i * 8 + j + 1234;
         }
-        a[i] = u32x8(b);
+        a[i] = b;
     }
     for (auto _ : state) {
         ifft(a);

@@ -21,14 +21,14 @@ using modint8 = ModInt8<MOD>;
 
 TEST(ModInt8Test, Constructor) {
     modint8 a(1, 2 + MOD, 3, 4, 5, 6 + MOD, 7, 8);
-    modint8 b(u32x8(1, 2, 3 + MOD, 4, 5, 6, 7, 8 + MOD));
+    modint8 b(std::array<u32, 8>({1, 2, 3 + MOD, 4, 5, 6, 7, 8 + MOD}));
 
     modint8 expect(1, 2, 3, 4, 5, 6, 7, 8);
 
     ASSERT_EQ(expect, a);
     ASSERT_EQ(expect, b);
 }
-TEST(ModInt8Test, ToArray) {
+TEST(ModInt8Test, Val) {
     modint8 a(0, 0, 1, 1, 2, 2, 3, 3);
 
     std::array<u32, 8> expect({0, 0, 1, 1, 2, 2, 3, 3});
@@ -74,9 +74,14 @@ TEST(ModInt8Test, Equal) {
 
 TEST(ModInt8Test, PermuteVar) {
     modint8 a = {0, 10, 20, 30, 40, 50, 60, 70};
-    u32x8 idx = {6, 6, 2, 7, 0, 1, 6, 7};
 
-    ASSERT_EQ(modint8(60, 60, 20, 70, 0, 10, 60, 70), a.permutevar(idx));
+    ASSERT_EQ(modint8(60, 60, 20, 70, 0, 10, 60, 70),
+              a.permutevar({6, 6, 2, 7, 0, 1, 6, 7}));
+}
+TEST(ModInt8Test, Rotate) {
+    modint8 a = {0, 1, 2, 3, 4, 5, 6, 7};
+
+    ASSERT_EQ(modint8(3, 4, 5, 6, 7, 0, 1, 2), a.rotate(3));
 }
 
 TEST(ModInt8Test, Blend) {
@@ -84,6 +89,13 @@ TEST(ModInt8Test, Blend) {
     modint8 b = {10, 20, 30, 40, 50, 60, 70, 80};
 
     ASSERT_EQ(modint8(1, 20, 30, 4, 5, 6, 7, 80), blend<0b10000110>(a, b));
+}
+TEST(ModInt8Test, BlendVar) {
+    modint8 a = {1, 2, 3, 4, 5, 6, 7, 8};
+    modint8 b = {10, 20, 30, 40, 50, 60, 70, 80};
+
+    ASSERT_EQ(modint8(10, 2, 30, 40, 50, 6, 70, 80),
+              blendvar(a, b, {1, 0, -1u, 1, 1, 0, 100, 1u << 31}));
 }
 
 TEST(ModInt8Test, Neg) {

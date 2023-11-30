@@ -108,7 +108,7 @@ TEST(FFTTest, ButterflyStress) {
             for (int j = 0; j < 8; j++) {
                 a[j] = randint(0u, MOD - 1);
             }
-            expect[i] = u32x8(a);
+            expect[i] = a;
         }
         auto actual = expect;
 
@@ -128,7 +128,7 @@ TEST(FFTTest, InvButterflyStress) {
             for (int j = 0; j < 8; j++) {
                 a[j] = randint(0u, MOD - 1);
             }
-            expect[i] = u32x8(a);
+            expect[i] = a;
         }
         std::vector<modint8> actual = expect;
 
