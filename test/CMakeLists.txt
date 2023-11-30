@@ -45,3 +45,4 @@ target_link_libraries(fft_bench benchmark::benchmark)
 
 # oj
 add_executable(oj_convolution oj/convolution.test.cpp)
+add_executable(oj_inv oj/inv.test.cpp)

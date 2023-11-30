@@ -110,7 +110,7 @@ template <u32 MOD> struct ModInt8 {
     }
 
     // a[i] <- a[(middle + i) % 8]
-    ModInt8 rotate(u32 middle) {
+    ModInt8 rotate(u32 middle) const {
         static const m256i_u base = _mm256_set_epi32(7, 6, 5, 4, 3, 2, 1, 0);
         return permutevar(_mm256_add_epi32(base, _mm256_set1_epi32(middle)));
     }
@@ -149,7 +149,6 @@ template <u32 MOD> struct ModInt8 {
         x0 = _mm256_srli_epi64(x0, 32);
         return _mm256_blend_epi32(x0, x1, 0b10101010);
     }
-
     // (lr[0], lr[2], lr[4], lr[6])
     static m256i_u mul_even(const m256i_u& l, const m256i_u& r) {
         return _mm256_mul_epu32(l, r);
