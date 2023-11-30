@@ -25,16 +25,15 @@ template <int MOD> struct ModVec {
                 buf[j] = *it;
                 it++;
             }
-            v[i] = buf;
+            v[i] = modint8(buf);
         }
     }
     ModVec(std::initializer_list<i32> li) : n(ssize(li)), v(vsize(n)) {
         auto it = li.begin();
         for (int i = 0; i < ssize(v); i++) {
-            // TODO: avoid to convert to modint
-            std::array<modint, 8> buf = {};
+            std::array<i32, 8> buf = {};
             for (int j = 0; j < 8 && (i * 8 + j) < n; j++) {
-                buf[j] = modint(*it);
+                buf[j] = *it;
                 it++;
             }
             v[i] = modint8(buf);
