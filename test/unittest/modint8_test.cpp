@@ -1,8 +1,8 @@
 #include <array>
 #include <numeric>
 #include <random>
-#include <vector>
 #include <span>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -25,7 +25,8 @@ TEST(ModInt8Test, Constructor) {
     modint8 a(1, 2 + MOD, 3, 4, 5, 6 + MOD, 7, 8);
     modint8 b(std::array<u32, 8>({1, 2, 3 + MOD, 4, 5, 6, 7, 8 + MOD}));
     modint8 c(std::array<modint, 8>({1, 2, 3, 4, 5, 6, 7, 8}));
-    modint8 d(std::array<i32, 8>({1 - (i32)MOD, 2, 3, 4 + (i32)MOD, 5, 6 - (i32)MOD, 7, 8}));
+    modint8 d(std::array<i32, 8>(
+        {1 - (i32)MOD, 2, 3, 4 + (i32)MOD, 5, 6 - (i32)MOD, 7, 8}));
 
     modint8 expect(1, 2, 3, 4, 5, 6, 7, 8);
 
@@ -35,11 +36,10 @@ TEST(ModInt8Test, Constructor) {
     ASSERT_EQ(expect, d);
 }
 TEST(ModInt8Test, Val) {
-    modint8 a(0, 0, 1, 1, 2, 2, 3, 3);
-
-    std::array<u32, 8> expect({0, 0, 1, 1, 2, 2, 3, 3});
-
-    ASSERT_EQ(expect, a.val());
+    ASSERT_EQ((std::array<u32, 8>({0, 0, 1, 1, 2, 2, 3, 3})),
+              modint8(0, 0, 1, 1, 2, 2, 3, 3).val());
+    ASSERT_EQ((std::array<u32, 8>({0, 1, 2, 3, 4, 5, 6, 7})),
+              modint8(0, 1, 2, 3, 4, 5, 6, 7).val());
 }
 
 TEST(ModInt8Test, Add) {
@@ -81,13 +81,13 @@ TEST(ModInt8Test, Equal) {
 TEST(ModInt8Test, PermuteVar) {
     modint8 a(0, 10, 20, 30, 40, 50, 60, 70);
 
-    ASSERT_EQ(modint8(60, 60, 20, 70, 0, 10, 60, 70),
-              a.permutevar({6, 6, 2, 7, 0, 1, 6, 7}));
+    ASSERT_EQ(modint8(60, 30, 20, 50, 0, 10, 40, 70),
+              a.permutevar({6, 3, 2, 5, 0, 1, 4, 7}));
 }
 TEST(ModInt8Test, Rotate) {
     modint8 a(0, 1, 2, 3, 4, 5, 6, 7);
-
-    ASSERT_EQ(modint8(3, 4, 5, 6, 7, 0, 1, 2), a.rotate(3));
+    ASSERT_EQ((std::array<u32, 8>({3, 4, 5, 6, 7, 0, 1, 2})),
+              a.rotate(3).val());
 }
 
 TEST(ModInt8Test, Blend) {

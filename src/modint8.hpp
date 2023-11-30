@@ -2,6 +2,7 @@
 
 #include <immintrin.h>
 #include <array>
+#include <cassert>
 #include <span>
 
 #include "math.hpp"
@@ -19,14 +20,6 @@ template <u32 MOD> struct ModInt8 {
 
     static constexpr u32 mod() { return MOD; }
 
-    inline static const m256i_u MOD_X = _mm256_set1_epi32(MOD);
-    inline static const m256i_u MOD2_X = _mm256_set1_epi32(2 * MOD);
-    inline static const m256i_u N_INV_X = _mm256_set1_epi32(-inv_u32(MOD));
-    inline static const m256i_u INT_MIN_X = _mm256_set1_epi32(u32(1) << 31);
-
-    static constexpr u32 B2 = pow_mod_constexpr(2, 64, MOD);
-    inline static const m256i_u B2_X = _mm256_set1_epi32(B2);
-
     ModInt8() : x(_mm256_setzero_si256()) {}
     ModInt8(std::span<const i32, 8> _x)
         : x(mul(_mm256_sub_epi32(_mm256_loadu_si256((m256i_u*)_x.data()),
@@ -39,7 +32,9 @@ template <u32 MOD> struct ModInt8 {
         : x(mul(_mm256_loadu_si256((m256i_u*)_x.data()),
                 _mm256_set1_epi32(B2))) {}
     ModInt8(std::span<const modint, 8> _x)
-        : x(_mm256_loadu_si256((m256i_u*)_x.data())) {}
+        : x(_mm256_loadu_si256((m256i_u*)_x.data())) {
+            static_assert(sizeof(modint) == 4);
+        }
     explicit ModInt8(modint x0,
                      modint x1,
                      modint x2,
@@ -66,11 +61,7 @@ template <u32 MOD> struct ModInt8 {
     std::array<u32, 8> val() const {
         auto a = mul(x, _mm256_set1_epi32(1));
         alignas(32) std::array<u32, 8> b;
-        _mm256_store_si256((__m256i_u*)b.data(), a);
-        // TODO: optimize
-        for (int i = 0; i < 8; i++) {
-            b[i] %= MOD;
-        }
+        _mm256_storeu_si256((__m256i_u*)b.data(), min(a, _mm256_sub_epi32(a, MOD_X)));
         return b;
     }
 
@@ -103,16 +94,13 @@ template <u32 MOD> struct ModInt8 {
     ModInt8 operator-() const { return ModInt8() - *this; }
 
     friend bool operator==(const ModInt8& lhs, const ModInt8& rhs) {
-        // TODO: optimize
-        return lhs.val() == rhs.val();
+        auto lx = lhs.x, rx = rhs.x;
+        lx = min(lx, _mm256_sub_epi32(lx, MOD_X));
+        rx = min(rx, _mm256_sub_epi32(rx, MOD_X));
+        auto z = _mm256_xor_si256(lx, rx);
+        return _mm256_testz_si256(z, z);
     }
 
-    // a.permutevar(idx)[i] = a[idx[i] % 8]
-    ModInt8 permutevar(const m256i_u& idx) const {
-        ModInt8 v;
-        v.x = _mm256_permutevar8x32_epi32(x, idx);
-        return v;
-    }
     // a.permutevar(idx)[i] = a[idx[i] % 8]
     ModInt8 permutevar(const std::array<u32, 8>& idx) const {
         return permutevar(_mm256_loadu_si256((m256i_u*)idx.data()));
@@ -145,6 +133,14 @@ template <u32 MOD> struct ModInt8 {
   private:
     m256i_u x;
 
+    inline static const m256i_u MOD_X = _mm256_set1_epi32(MOD);
+    inline static const m256i_u MOD2_X = _mm256_set1_epi32(2 * MOD);
+    inline static const m256i_u N_INV_X = _mm256_set1_epi32(-inv_u32(MOD));
+    inline static const m256i_u INT_MIN_X = _mm256_set1_epi32(u32(1) << 31);
+
+    static constexpr u32 B2 = pow_mod_constexpr(2, 64, MOD);
+    inline static const m256i_u B2_X = _mm256_set1_epi32(B2);
+
     // Input: l * r <= 2^32 * MOD
     // Output: l * r >>= 2^32
     static m256i_u mul(const m256i_u& l, const m256i_u& r) {
@@ -167,6 +163,13 @@ template <u32 MOD> struct ModInt8 {
     }
     static m256i_u max(const m256i_u& l, const m256i_u& r) {
         return _mm256_max_epu32(l, r);
+    }
+
+    // a.permutevar(idx)[i] = a[idx[i] % 8]
+    ModInt8 permutevar(const m256i_u& idx) const {
+        ModInt8 v;
+        v.x = _mm256_permutevar8x32_epi32(x, idx);
+        return v;
     }
 };
 
