@@ -5,10 +5,18 @@ on: [push, pull_request]
 jobs:
   oj:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        avx2: [ON, OFF]
+
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: pip3 install -U online-judge-verify-helper
+      - if: ${{ matrix.avx2 }} == "ON"
+        run: cp .verify-helper/config_without_avx2.toml .verify-helper/config.toml
       - name: Run tests
         run: |
+          ulimit -s unlimited
           oj-verify run
