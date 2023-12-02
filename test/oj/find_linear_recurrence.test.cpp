@@ -23,18 +23,18 @@ int main() {
     std::vector<mint> a(n);
     for (int i = 0; i < n; i++) {
         int x;
-        sc.read(x);
+        cin >> x;
         a[i] = x;
     }
 
-    auto c = modvec(a).berlekamp_massey().val();
+    auto c = mvec(a).berlekamp_massey().val();
 
-    int m = c.size();
+    auto m = ssize(c);
 
-    pr.writeln(m - 1);
+    cout << m - 1 << endl;
     for (int i = 0; i < m - 1; i++) {
-        pr.write(c[i + 1].val());
-        pr.write(' ');
+        if (i) cout << " ";
+        cout << c[i + 1];
     }
-    pr.writeln();
+    cout << endl;
 }
