@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cassert>
+#include <iostream>
 
 #include "fastfps/types.hpp"
 
@@ -83,6 +84,10 @@ template <u32 MOD> struct ModInt {
     constexpr ModInt inv() const {
         // TODO: for non-prime
         return pow(MOD - 2);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const ModInt& v) {
+        return os << v.val();
     }
 
   private:

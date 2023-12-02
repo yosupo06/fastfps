@@ -59,6 +59,8 @@ template <int MOD> struct ModVec {
         }
     }
 
+    size_t size() const { return n; }
+
     std::vector<u32> val() const {
         std::vector<u32> _v(n);
         for (int i = 0; i < std::ssize(v); i++) {
@@ -84,8 +86,8 @@ template <int MOD> struct ModVec {
 
     ModVec& operator+=(const ModVec& rhs) {
         n = std::max(n, rhs.n);
-        if (size(v) < size(rhs.v)) {
-            v.resize(size(rhs.v));
+        if (std::size(v) < std::size(rhs.v)) {
+            v.resize(std::size(rhs.v));
         }
         for (int i = 0; i < std::ssize(rhs.v); i++) {
             v[i] += rhs.v[i];
@@ -98,8 +100,8 @@ template <int MOD> struct ModVec {
 
     ModVec& operator-=(const ModVec& rhs) {
         n = std::max(n, rhs.n);
-        if (size(v) < size(rhs.v)) {
-            v.resize(size(rhs.v));
+        if (std::size(v) < std::size(rhs.v)) {
+            v.resize(std::size(rhs.v));
         }
         for (int i = 0; i < std::ssize(rhs.v); i++) {
             v[i] -= rhs.v[i];
@@ -152,12 +154,16 @@ template <int MOD> struct ModVec {
     friend ModVec operator*(const ModVec& lhs, const modint& rhs) {
         return ModVec(lhs) *= rhs;
     }
+    friend ModVec operator*(const modint& lhs, const ModVec& rhs) {
+        return ModVec(rhs) *= lhs;
+    }
 
     // dst[dst_start .. dst_start + len) = this[start .. start + len)
     void copy_to(ssize_t start,
                  ssize_t len,
                  ModVec& dst,
                  ssize_t dst_start) const {
+        // TODO: be able to self move
         assert(0 <= start && start + len <= n);
         assert(0 <= dst_start && dst_start + len <= dst.n);
         if (len == 0) return;
@@ -297,6 +303,89 @@ template <int MOD> struct ModVec {
         }
         res.resize(m);
         return res;
+    }
+
+    ModVec substr(ssize_t st, ssize_t len) const {
+        assert(0 <= st && 0 <= len && st + len <= n);
+
+        ModVec b(len);
+        copy_to(st, len, b, 0);
+        return b;
+    }
+
+    // sum a[i] * b[i]
+    friend modint dot(const ModVec& lhs, const ModVec& rhs) {
+        modint8 sum;
+        for (int i = 0; i < std::min(std::ssize(lhs.v), std::ssize(rhs.v));
+             i++) {
+            sum += lhs.v[i] * rhs.v[i];
+        }
+        auto a = sum.val();
+        // TODO: optimize
+        modint ans;
+        for (int i = 0; i < 8; i++) {
+            ans += a[i];
+        }
+        return ans;
+    }
+
+    void reverse() {
+        auto prev_n = n;
+        n = std::ssize(v) * 8;
+        std::reverse(v.begin(), v.end());
+        for (modint8& x : v) {
+            x = x.permutevar({7, 6, 5, 4, 3, 2, 1, 0});
+        }
+
+        ModVec tmp(prev_n);
+        copy_to(n - prev_n, prev_n, tmp, 0);
+        *this = tmp;
+    }
+
+    ModVec berlekamp_massey() const {
+        ModVec b({-1}), c({-1});
+        modint y = 1;
+        for (int ed = 1; ed <= n; ed++) {
+            int l = int(c.size()), m = int(b.size());
+            b.resize(m + 1);
+            m++;
+
+            modint x = dot(c, substr(ed - l, l));
+            if (x == 0) continue;
+            modint freq = x * y.inv();
+            if (l < m) {
+                // use b
+                auto prev_c = c;
+
+                ModVec tmp(m);
+                c.copy_to(0, l, tmp, m - l);
+                c = tmp;
+                c -= freq * b;
+
+                b = prev_c;
+                y = x;
+            } else {
+                // use c
+
+                ModVec tmp(l);
+                b.copy_to(0, m, tmp, l - m);
+
+                c -= freq * tmp;
+            }
+        }
+        c.reverse();
+        return c;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const ModVec& r) {
+        auto r2 = r.val();
+
+        os << "[";
+        for (int i = 0; i < std::ssize(r2); i++) {
+            if (i) os << ", ";
+            os << r2[i];
+        }
+        return os << "]";
     }
 
   private:
