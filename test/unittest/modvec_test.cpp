@@ -142,7 +142,6 @@ TEST(ModVecTest, Reverse) {
 }
 
 TEST(ModVecTest, LinearRecurrence) {
-    //modvec a = modvec({1, 1, 2, 3, 5, 8, 13, 21});
     modvec a = modvec({3, 4, 6, 10, 18, 34});
-    ASSERT_EQ(modvec({3, 4, 5, 6, 7, 8, 9}), a.berlekamp_massey());
+    ASSERT_EQ(modvec({-1, 3, -2}), a.berlekamp_massey());
 }
